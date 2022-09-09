@@ -32,6 +32,10 @@ class GitHub extends Service {
     return false;
   }
 
+  async _GET (path, params = {}) {
+    return this.octokit.request(`GET ${path}`, params);
+  }
+
   async _getOrganizationRepositoryCount (name) {
     const response = await this.graphQL(`query ($login: String!) {
       organization(login: $login) {
