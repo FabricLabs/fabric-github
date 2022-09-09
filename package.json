@@ -1,0 +1,27 @@
+{
+  "name": "@fabric/github",
+  "version": "0.1.0",
+  "description": "GitHub connectivity for Fabric.",
+  "main": "services/github.js",
+  "scripts": {
+    "test": "mocha tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/martindale/fabric-github.git"
+  },
+  "keywords": [
+    "fabric",
+    "github"
+  ],
+  "author": "Fabric Labs",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/martindale/fabric-github/issues"
+  },
+  "homepage": "https://github.com/martindale/fabric-github#readme",
+  "dependencies": {
+    "@fabric/core": "FabricLabs/fabric#master",
+    "@octokit/core": "^4.0.5"
+  }
+}
