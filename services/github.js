@@ -31,6 +31,9 @@ class GitHub extends Service {
 
     this._state = {
       content: {
+        actors: {},
+        documents: {},
+        issues: {},
         report: {}
       }
     };
@@ -55,7 +58,7 @@ class GitHub extends Service {
     const existing = await this._GET(`/repos/${path}`);
     const template = {
       type: 'FabricGitHubIssue',
-      object: existing.data.body
+      object: existing.data
     };
 
     const origin = new Actor(template);
@@ -67,12 +70,11 @@ class GitHub extends Service {
       `- [ ] Tests (@martindale)`
     ].join('\n');
 
-    const body = existing.data.body;
 
     var frontmatter = null;
 
     try {
-      frontmatter = yaml.parse(existing.data.body);
+      frontmatter = yaml.parse(template.object);
     } catch (exception) {
       // this.emit('error', `Unable to parse frontmatter: ${JSON.stringify(exception)}`);
       // frontmatter = yaml.parse(src);
@@ -80,7 +82,7 @@ class GitHub extends Service {
 
     return {
       address: null,
-      issue: existing.data,
+      issue: template.object,
       meta: frontmatter
     }
   }
@@ -126,6 +128,19 @@ class GitHub extends Service {
       address: null,
       meta: frontmatter
     }
+  }
+
+  async _syncBountyAddress (target) {
+    const bounty = await this._getBountyAddress(target);
+    const actor = new Actor({
+      address: bounty.address,
+      path: target
+    });
+
+    this._state.content.issues[actor.id] = actor.toGenericMessage();
+    this.commit();
+
+    return this;
   }
 
   graphQL (query, params = {}) {
