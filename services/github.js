@@ -18,7 +18,9 @@ class GitHub extends Service {
     this.octokit = new Octokit({ auth: this.settings.token });
 
     this._state = {
-      content: {}
+      content: {
+        report: {}
+      }
     };
 
     return this;
@@ -69,6 +71,18 @@ class GitHub extends Service {
     // TODO: attach reporter here (_beat, etc.)
     // periodically re-sync (1/~24 hours)
     await super.start();
+    return this;
+  }
+
+  async sync () {
+    const report = await this._getReport();
+
+    this.state.report = {
+      json: report
+    };
+
+    this.commit();
+
     return this;
   }
 }
