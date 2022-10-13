@@ -1,6 +1,7 @@
 'use strict';
 
 const yaml = require('yaml');
+const Actor = require('@fabric/core/types/actor');
 const Message = require('@fabric/core/types/message');
 const Service = require('@fabric/core/types/service');
 const { Octokit } = require('@octokit/core');
@@ -52,19 +53,34 @@ class GitHub extends Service {
   async _getBountyAddress (path, owner, repository, issue) {
     if (!path) path = `${owner}/${repository}/issues/${issue}`;
     const existing = await this._GET(`/repos/${path}`);
+    const template = {
+      type: 'FabricGitHubIssue',
+      object: existing.data.body
+    };
+
+    const origin = new Actor(template);
     const src = [
-      `---`,
+      '---',
       `title: ${this.settings.title || 'Fabric Bounty Address'}`,
       `---`,
       `# TODO`
       `- [ ] Tests (@martindale)`
     ].join('\n');
 
-    const frontmatter = yaml.parse(src);
+    const body = existing.data.body;
+
+    var frontmatter = null;
+
+    try {
+      frontmatter = yaml.parse(existing.data.body);
+    } catch (exception) {
+      // this.emit('error', `Unable to parse frontmatter: ${JSON.stringify(exception)}`);
+      // frontmatter = yaml.parse(src);
+    }
 
     return {
       address: null,
-      issue: existing,
+      issue: existing.data,
       meta: frontmatter
     }
   }
