@@ -77,7 +77,8 @@ describe('@fabric/core/types/github', function () {
       assert.ok(report);
       assert.ok(report.issue);
       assert.ok(report.issue.user);
-      assert.strictEqual(report.issue.user, 'martindale');
+      assert.ok(report.issue.user.login);
+      assert.strictEqual(report.issue.user.login, 'martindale');
 
       await github.stop();
       assert.ok(github);
