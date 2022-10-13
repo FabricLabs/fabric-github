@@ -61,17 +61,7 @@ class GitHub extends Service {
       object: existing.data
     };
 
-    const origin = new Actor(template);
-    const src = [
-      '---',
-      `title: ${this.settings.title || 'Fabric Bounty Address'}`,
-      `---`,
-      `# TODO`
-      `- [ ] Tests (@martindale)`
-    ].join('\n');
-
-
-    var frontmatter = null;
+    var frontmatter = {};
 
     try {
       frontmatter = yaml.parse(template.object);
@@ -132,8 +122,9 @@ class GitHub extends Service {
 
   async _syncBountyAddress (target) {
     const bounty = await this._getBountyAddress(target);
+    const state = Object.assign({}, this.state, bounty.meta);
+    const front = yaml.stringify(state);
     const actor = new Actor({
-      address: bounty.address,
       path: target
     });
 
@@ -151,13 +142,22 @@ class GitHub extends Service {
     // TODO: attach reporter here (_beat, etc.)
     // periodically re-sync (1/~24 hours)
     await super.start();
+    this._state.content.status = 'STARTED';
+    await this.commit();
+    return this;
+  }
+
+  async stop () {
+    this._state.content.status = 'STOPPED';
+    this.commit();
+    await super.stop();
     return this;
   }
 
   async sync () {
     const report = await this._getReport();
 
-    this.state.report = {
+    this._state.content.report = {
       json: report
     };
 
