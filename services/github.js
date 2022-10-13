@@ -5,7 +5,16 @@ const Message = require('@fabric/core/types/message');
 const Service = require('@fabric/core/types/service');
 const { Octokit } = require('@octokit/core');
 
+/**
+ * Interact with GitHub from Fabric.
+ * @extends {Service}
+ */
 class GitHub extends Service {
+  /**
+   * Create an instance of the GitHub Service.
+   * @param {Object} [settings] Configuration.
+   * @returns {GitHub} Instance of {@link GitHub}.
+   */
   constructor (settings = {}) {
     super(settings);
 
@@ -41,6 +50,8 @@ class GitHub extends Service {
   }
 
   async _getBountyAddress (path, owner, repository, issue) {
+    if (!path) path = `${owner}/${repository}/issues/${issue}`;
+    const existing = await this._GET(`/repos/${path}`);
     const src = [
       `---`,
       `title: ${this.settings.title || 'Fabric Bounty Address'}`,
@@ -53,6 +64,7 @@ class GitHub extends Service {
 
     return {
       address: null,
+      issue: existing,
       meta: frontmatter
     }
   }
@@ -80,6 +92,24 @@ class GitHub extends Service {
     };
 
     return `${JSON.stringify(report, null, '  ')}`;
+  }
+
+  async _setBountyAddress (path, owner, repository, issue) {
+    const existing = await this._getBountyAddress(path, owner, repository, issue);
+    const src = [
+      `---`,
+      `title: ${this.settings.title || 'Fabric Bounty Address'}`,
+      `---`,
+      `# TODO`
+      `- [ ] Tests (@martindale)`
+    ].join('\n');
+
+    const frontmatter = yaml.parse(src);
+
+    return {
+      address: null,
+      meta: frontmatter
+    }
   }
 
   graphQL (query, params = {}) {
