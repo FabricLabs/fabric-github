@@ -1,5 +1,7 @@
 'use strict';
 
+const yaml = require('yaml');
+const Message = require('@fabric/core/types/message');
 const Service = require('@fabric/core/types/service');
 const { Octokit } = require('@octokit/core');
 
@@ -36,6 +38,23 @@ class GitHub extends Service {
 
   async _GET (path, params = {}) {
     return this.octokit.request(`GET ${path}`, params);
+  }
+
+  async _getBountyAddress (path, owner, repository, issue) {
+    const src = [
+      `---`,
+      `title: ${this.settings.title || 'Fabric Bounty Address'}`,
+      `---`,
+      `# TODO`
+      `- [ ] Tests (@martindale)`
+    ].join('\n');
+
+    const frontmatter = yaml.parse(src);
+
+    return {
+      address: null,
+      meta: frontmatter
+    }
   }
 
   async _getOrganizationRepositoryCount (name) {
