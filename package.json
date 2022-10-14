@@ -21,8 +21,9 @@
   },
   "homepage": "https://github.com/FabricLabs/fabric-github#readme",
   "dependencies": {
-    "@fabric/core": "FabricLabs/fabric#master",
-    "@octokit/core": "4.0.5"
+    "@fabric/core": "FabricLabs/fabric#feature/lightning",
+    "@octokit/core": "4.0.5",
+    "yaml": "2.1.3"
   },
   "devDependencies": {
     "c8": "7.12.0",

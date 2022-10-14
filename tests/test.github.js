@@ -51,5 +51,37 @@ describe('@fabric/core/types/github', function () {
       await github.stop();
       assert.ok(github);
     });
+
+    it('can get a known issue', async function () {
+      const github = new GitHub();
+
+      await github.start();
+      assert.ok(github);
+
+      const report = await github._GET('/repos/FabricLabs/fabric/issues/1');
+      assert.ok(report);
+
+      await github.stop();
+      assert.ok(github);
+    });
+
+    it('sync a known issue', async function () {
+      const github = new GitHub();
+
+      await github.start();
+      assert.ok(github);
+
+      const report = await github._getBountyAddress('FabricLabs/fabric/issues/1');
+      console.log('report:', report);
+      console.log('issue:', report.issue);
+      assert.ok(report);
+      assert.ok(report.issue);
+      assert.ok(report.issue.user);
+      assert.ok(report.issue.user.login);
+      assert.strictEqual(report.issue.user.login, 'martindale');
+
+      await github.stop();
+      assert.ok(github);
+    });
   });
 });
